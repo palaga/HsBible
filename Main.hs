@@ -1,6 +1,7 @@
 module Main where
 
 import BibTex
+import System.Console.ANSI
 import System.Environment            (getArgs)
 import Text.ParserCombinators.Parsec (parseFromFile)
 import Control.Monad                 (mapM_)
@@ -17,16 +18,15 @@ main = do
   references  <- parseFromFile bibliography file
   case references of
     Left  err  -> print err
-    Right refs -> mapM_ printReference refs
+    Right refs -> mapM_ printReference $ refs `refMatching` filters
 
 
-findRefMatching :: Filter -> Bibliography -> Bibliography
-findRefMatching pair bib = let pred = (matchFields pair) . getFields
-                           in  filter pred bib
-
-
-matchFields (k, p) fs = maybe False (=~ p)
-                      $ lookup k fs
+refMatching :: Bibliography -> [Filter] -> Bibliography
+refMatching bib fs       = filter (predicate . getFields) bib
+  where
+    predicate   r        = and $ map (matchFields r) fs
+    matchFields r (k, p) = maybe False (=~ p)
+                         $ lookup k r
 
 
 pairElements :: [a] -> [(a, a)]
@@ -40,8 +40,14 @@ x =~ y = match (makeRegexOpts compCaseless defaultExecOpt y :: Regex) x
 
 printReference :: Reference -> IO ()
 printReference r = do
-  putStrLn    $ getName   r ++ ":"
+  putStrLn    $ colorize Green $ getName   r ++ ":"
   printFields $ getFields r
+
+
+colorize :: Color -> String -> String
+colorize c s = colorCode ++ s ++ reset
+  where colorCode = setSGRCode [SetColor Foreground Vivid c]
+        reset     = setSGRCode [Reset]
 
 
 printFields :: Fields -> IO ()
