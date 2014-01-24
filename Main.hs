@@ -5,7 +5,7 @@ import System.Console.ANSI
 import System.Environment            (getArgs)
 import Text.ParserCombinators.Parsec (parseFromFile)
 import Control.Monad                 (mapM_)
-import Text.Regex.PCRE               hiding ((=~))
+import Text.Regex.PCRE
 
 
 type Fields = [(String, String)]
@@ -25,7 +25,8 @@ refMatching :: Bibliography -> [Filter] -> Bibliography
 refMatching bib fs       = filter (predicate . getFields) bib
   where
     predicate   r        = and $ map (matchFields r) fs
-    matchFields r (k, p) = maybe False (=~ p)
+    matchCaseless x      = match $ makeRegexOpts compCaseless defaultExecOpt x
+    matchFields r (k, p) = maybe False (matchCaseless p)
                          $ lookup k r
 
 
@@ -36,11 +37,9 @@ pairElements xs = case xs of
   _             -> []
 
 
-x =~ y = match (makeRegexOpts compCaseless defaultExecOpt y :: Regex) x
-
 printReference :: Reference -> IO ()
 printReference r = do
-  putStrLn    $ colorize Green $ getName   r ++ ":"
+  putStrLn    $ colorize Green $ getName r ++ ":"
   printFields $ getFields r
 
 
