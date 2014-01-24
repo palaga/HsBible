@@ -21,11 +21,12 @@ main = do
 
 
 findRefMatching :: Filter -> Bibliography -> Bibliography
-findRefMatching fil bib = filter ((matchFields fil) . getFields) bib
+findRefMatching pair bib = let pred = (matchFields pair) . getFields
+                           in  filter pred bib
 
 
-matchFields (key, pattern) fields = maybe False (=~ pattern)
-                                  $ lookup key fields
+matchFields (k, p) fs = maybe False (=~ p)
+                      $ lookup k fs
 
 
 pairElements :: [a] -> [(a, a)]
