@@ -1,12 +1,17 @@
 HsBible
 =======
 
-A bibtex search tool written in haskell. It supports different output formatting styles. However, this is not yet configurable.
+A bibtex search tool written in haskell. It supports different output formatting
+styles. However, this is not yet configurable.
 
 Usage
 -----
 
-This tool can be used to search bibtex files using regular expressions. Just use `ghc --make Main.hs` to compile the program. The program expects a bibtex file followed by a set of key/pattern pairs, as arguments. For example:
+This tool can be used to search bibtex files using regular expressions. After
+you've installed the dependencies with `cabal install parsec regex-pcre
+ansi-terminal`, you can compile the program with `ghc --make Main.hs`.  The
+program expects a bibtex file followed by a set of key/pattern pairs, as
+arguments. For example:
 ```
 $ ./Main references.bib author 'mccarthy' title 'rec.*func.*symb.*expr.*'
 @article{rfsetcm1960,
