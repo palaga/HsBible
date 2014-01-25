@@ -1,6 +1,7 @@
 module BibTex (
     Bibliography
   , Reference(..)
+  , Field
   , bibliography
   ) where
 
